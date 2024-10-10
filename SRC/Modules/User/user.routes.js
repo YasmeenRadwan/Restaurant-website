@@ -8,7 +8,7 @@ import { signUpSchema , updateSchema ,updatePasswordSchema ,forgetPasswordSchema
 import {validationMiddleware} from '../../Middleware/validation.middleware.js'
 
 router.post('/signUp',validationMiddleware(signUpSchema), errorHandle(userController.signUp))
-router.get('/signIn',errorHandle(userController.signIn));
+router.post('/signIn',errorHandle(userController.signIn));
 router.patch('/',auth(),validationMiddleware(updateSchema),errorHandle(userController.updateAccount))
 router.delete('/',auth(), errorHandle(userController.deleteAccount))
 router.get('/',auth(), errorHandle(userController.getAccountData))

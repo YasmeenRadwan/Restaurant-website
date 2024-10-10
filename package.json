@@ -1,11 +1,11 @@
 {
-  "name": "exam-project",
+  "name": "Restaurant Website",
   "version": "1.0.0",
-  "description": "Route Exam ",
+  "description": "Restaurant Backend Depi Project ",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "SET NODE_ENV=dev&node index.js"
+    "start": "node index.js"
   },
   "author": "Yasmeen Radwan",
   "license": "ISC",
