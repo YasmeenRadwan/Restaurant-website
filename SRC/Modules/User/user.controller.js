@@ -7,7 +7,7 @@ import { errorHandlerClass } from "../../utils/error-class.utils.js";
 ////////////////////// signUp  ////////////////////////////
 export const signUp=async(req,res,next)=>{
  
-        const{firstName,lastName,email,password,mobileNumber,address,role}=req.body;
+        const{firstName,lastName,email,password,confirmPassword,mobileNumber,address,role}=req.body;
         const hashedPassword=hashSync(password,+process.env.SALT_ROUNDS);
         // Insure the Email exists
         const isEmailExist=await User.findOne({email})
@@ -17,7 +17,7 @@ export const signUp=async(req,res,next)=>{
         }
 
         const userInstance= new User({firstName,lastName,email,password:hashedPassword,mobileNumber,address,role});
-        console.log("userInstance",userInstance)
+
 
         const newUser = await userInstance.save();
         res.json({message: "user created " , newUser})
@@ -42,7 +42,7 @@ export const signIn=async(req,res,next)=>{
         }
          await user.save();
          // Generate a JWT token for the user with their ID and secret signature
-        const token=jwt.sign({_id:user._id},'accessTokenSignature',{expiresIn:'2d'});
+        const token=jwt.sign({_id:user._id},'accessTokenSignature',{expiresIn:'14d'});
 
         res.json({message: "Logged In Successfully",token})
 }

@@ -24,25 +24,22 @@ const userSchema=new Schema(
         },
         mobileNumber : {
             type: String,
-            required:true,
             unique:true,
+            sparse: true,
         },
-        address: {
+        address: [{
             street: {
                 type: String,
-                required: true,
                 minlength: 3,
                 maxlength: 100
             },
             city: {
                 type: String,
-                required: true,
                 minlength: 3,
                 maxlength: 50
             },
             country: {
                 type: String,
-                required: true,
                 minlength: 3,
                 maxlength: 50
             },
@@ -61,7 +58,7 @@ const userSchema=new Schema(
                 minlength: 3,
                 maxlength: 200
             }
-        },
+        }],
         role: {
             type: String,
             enum:Object.values(systemRoles),

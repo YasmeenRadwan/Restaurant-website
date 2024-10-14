@@ -1,5 +1,4 @@
 import joi from 'joi';
-import { generalRules } from '../../utils/general-rules.utils.js'
 
 //////////////////// sign up schema ///////////////
 export const signUpSchema= {
@@ -12,14 +11,14 @@ export const signUpSchema= {
 
         password : joi.string().min(6).required().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*])[A-Za-z\d@$!%*]{8,}$/),
         mobileNumber : joi.string().pattern(/^\d{11}$/),
-        address: joi.object({
+        address: joi.array().items(joi.object({
             street: joi.string().required().min(3).max(100),
             city: joi.string().required().min(3).max(50),
             country: joi.string().required().min(3).max(50),
             buildingName: joi.string().min(3).max(100), 
             apartmentNo: joi.string().min(1).max(10),
             additional: joi.string().min(3).max(200) 
-        }), 
+        })), 
 
         role:joi.string().valid('User', 'Admin').default('User')
     })
@@ -36,14 +35,14 @@ export const updateSchema= {
             tlds: { allow: ['com', 'net']}}).messages({"any.required" : " You must enter Email "}),
 
         mobileNumber : joi.string().pattern(/^\d{11}$/),
-        address: joi.object({
-            street: joi.string().min(3).max(100),
-            city: joi.string().min(2).max(50),
-            country: joi.string().min(2).max(50),
-            buildingName: joi.string().min(2).max(100), // Not required
-            apartmentNo: joi.string().min(1).max(10), // Not required
-            additional: joi.string().min(3).max(200)
-        }),
+        address: joi.array().items(joi.object({
+            street: joi.string().required().min(3).max(100),
+            city: joi.string().required().min(3).max(50),
+            country: joi.string().required().min(3).max(50),
+            buildingName: joi.string().min(3).max(100), 
+            apartmentNo: joi.string().min(1).max(10),
+            additional: joi.string().min(3).max(200) 
+        })), 
 
     })
 }
