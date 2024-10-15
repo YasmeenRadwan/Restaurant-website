@@ -1,14 +1,14 @@
 import express from 'express'
 import {connectionDB} from './DB/connection.js'
-import { globalResponse } from './SRC/Middleware/error-handle.middleware.js'
+import { globalResponse } from './SRC/Middleware/error-handle.middleware.js';
 
 import userRouter from './SRC/Modules/User/user.routes.js'
 import { config } from 'dotenv';
 import path from "path";
 
-
-const app = express()
-
+import cors from 'cors'; 
+ 
+const app = express();
 
 if (process.env.NODE_ENV == 'prod') {
     config({path : path.resolve('.prod.env')})
@@ -21,7 +21,7 @@ config()
 
 
 let port = process.env.PORT;
-
+app.use(cors());
 app.use(express.json())
 
 app.use('/user',userRouter);

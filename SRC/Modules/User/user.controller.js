@@ -42,7 +42,7 @@ export const signIn=async(req,res,next)=>{
         }
          await user.save();
          // Generate a JWT token for the user with their ID and secret signature
-        const token=jwt.sign({_id:user._id},'accessTokenSignature',{expiresIn:'14d'});
+        const token=jwt.sign({_id:user._id},process.env.LOGIN_SECRET,{expiresIn:'14d'});
 
         res.json({message: "Logged In Successfully",token})
 }
