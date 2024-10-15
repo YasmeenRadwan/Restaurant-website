@@ -1,7 +1,6 @@
 import { hashSync, compareSync } from "bcrypt";
 import User from "../../../DB/Models/user.model.js";
 import Session from "../../../DB/Models/session.model.js";
-import jwt from "jsonwebtoken";
 import { sendEmailService } from "../../Services/send-email.service.js";
 import { errorHandlerClass } from "../../utils/error-class.utils.js";
 import { v4 as uuidv4 } from "uuid";
