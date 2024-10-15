@@ -11,13 +11,13 @@ import { userToUser } from "../../utils/userObjectProcess.utils.js";
 export const signUp=async(req,res,next)=>{
  
         const{firstName,lastName,email,password,confirmPassword,mobileNumber,address,role}=req.body;
-        const hashedPassword=hashSync(password,+process.env.SALT_ROUNDS);
         // Insure the Email exists
         const isEmailExist=await User.findOne({email})
         
         if (isEmailExist){
           return next(new errorHandlerClass("Email Already Exists",400,"Email Already Exists",{email}))
         }
+        const hashedPassword=hashSync(password,+process.env.SALT_ROUNDS);
 
         const userInstance= new User({firstName,lastName,email,password:hashedPassword,mobileNumber,address,role});
 
