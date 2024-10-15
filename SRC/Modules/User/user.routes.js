@@ -14,10 +14,14 @@ router.post('/signIn',errorHandle(userController.signIn));
 router.patch('/',auth(),validationMiddleware(updateSchema),errorHandle(userController.updateAccount))
 router.delete('/',auth(), errorHandle(userController.deleteAccount))
 router.get('/',auth(), errorHandle(userController.getAccountData))
-router.get('/profile/:userProfileId',auth(),authorization(systemRoles.ADMIN),errorHandle(userController.getProfileData))
 router.put('/updatePassword',auth(),validationMiddleware(updatePasswordSchema), errorHandle(userController.updatePassword))
 router.post('/otpPassword', errorHandle(userController.otpPassword))
 router.post('/forgetPassword', validationMiddleware(forgetPasswordSchema),errorHandle(userController.forgetPassword))
+
+// admin routes
+router.get('/profile/:userProfileId',auth(),authorization(systemRoles.ADMIN),errorHandle(userController.getProfileData)) 
+router.patch('/updateUser/:userProfileId',auth(),authorization(systemRoles.ADMIN),errorHandle(userController.updateUser)) 
+router.delete('/deleteUser/:userProfileId',auth(),authorization(systemRoles.ADMIN),errorHandle(userController.deleteUser))
 
 export default router
 

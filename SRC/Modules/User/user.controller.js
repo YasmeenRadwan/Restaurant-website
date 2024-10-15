@@ -192,6 +192,51 @@ export const otpPassword = async (req,res,next) => {
     
         res.json('Password reset successfully');
     }
+
+////////////////////////////  update user Profile data (admin if needed) ///////////////////////////////////////////
+export const updateUser= async(req,res,next)=>{
+        
+    const { userProfileId }= req.params;
+
+    const {email , mobileNumber ,address, lastName , firstName}=req.body;
+    // Check for existing users with the new email or mobileNumber
+    if (email) {
+        const emailUser = await User.findOne({ email, _id: { $ne: userProfileId} });
+        if (emailUser) {
+          return next (new errorHandlerClass("There is another user with this email",409,"There is another user with this email",{emailUser}))
+        }
+    }
+
+    if (mobileNumber) {
+        const mobileNumberUser = await User.findOne({ mobileNumber, _id: { $ne: userProfileId } });
+        if (mobileNumberUser) {
+         return next (new errorHandlerClass("There is another user with this mobile Number",409,"There is another user with this mobile Number",mobileNumberUser.mobileNumber))
+        }
+    }
+    const updatedUser=await User.findOneAndUpdate({_id:userProfileId},
+        {email , mobileNumber ,address, lastName , firstName},
+        {new:true});
+    if (!updatedUser){
+        return next(new errorHandlerClass("User not found",404,"User not found"))
+    }
+    res.json({message: "User Account updated Successfully",updatedUser})
+}
+
+////////////////////////////  delete user data (admin if needed) ///////////////////////////////////////////
+export const deleteUser = async(req, res, next) => {
+    
+    const { userProfileId }= req.params;
+     const user = await User.findById(userProfileId);
+     if (!user) {
+        return next(new errorHandlerClass("Error in delete user", 404, "Error in delete user"));
+     }
+     // delete user 
+    const deletedUser = await User.findByIdAndDelete({_id:userProfileId});
+    if (!deletedUser) {
+        return next(new errorHandlerClass("User not found", 404, "User not found"));
+    }
+    res.json({ message: "User Account deleted successfully" });
+};
     
 
 
