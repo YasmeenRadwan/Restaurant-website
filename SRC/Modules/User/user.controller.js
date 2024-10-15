@@ -62,14 +62,14 @@ export const signIn=async(req,res,next)=>{
 
         const session = new Session({
           sessionId,
-          userId: userInstance._id,
+          userId: user._id,
         });
 
         await session.save();
 
         user.sessionId[0]
-          ? userInstance.sessionId.push(session._id)
-          : (userInstance.sessionId = [session._id]);
+          ? user.sessionId.push(session._id)
+          : (user.sessionId = [session._id]);
 
         await user.save();
         // Generate a JWT token for the user with their ID and secret signature
