@@ -1,8 +1,12 @@
-import { hashSync , compareSync } from "bcrypt";
-import User from "../../../DB/Models/user.model.js"
+import { hashSync, compareSync } from "bcrypt";
+import User from "../../../DB/Models/user.model.js";
+import Session from "../../../DB/Models/session.model.js";
 import jwt from "jsonwebtoken";
 import { sendEmailService } from "../../Services/send-email.service.js";
 import { errorHandlerClass } from "../../utils/error-class.utils.js";
+import { v4 as uuidv4 } from "uuid";
+import { generateJWT } from "../../utils/jwt.utils.js";
+import { userToUser } from "../../utils/userObjectProcess.utils.js";
 
 ////////////////////// signUp  ////////////////////////////
 export const signUp=async(req,res,next)=>{
@@ -18,12 +22,27 @@ export const signUp=async(req,res,next)=>{
 
         const userInstance= new User({firstName,lastName,email,password:hashedPassword,mobileNumber,address,role});
 
+        const sessionId = uuidv4();
 
+        const sessions = new Session({
+          sessionId,
+          userId: userInstance._id,
+        });
+      
+        await sessions.save();
+      
+        userInstance.sessionId[0]
+          ? userInstance.sessionId.push(sessions._id)
+          : (userInstance.sessionId = [sessions._id]);
+      
+        const token = generateJWT(userInstance._id, sessionId);
         const newUser = await userInstance.save();
-        res.json({message: "user created " , newUser})
+        const userToSend = userToUser(newUser);
+      
+        res.json({ message: "user created ", token, newUser: userToSend });
 }
 
- //////////////////////// signIn with email or mobile number/////////////////////////
+//////////////////////// signIn with email or mobile number/////////////////////////
 export const signIn=async(req,res,next)=>{
    
         const{identifier,password}=req.body;
@@ -37,15 +56,29 @@ export const signIn=async(req,res,next)=>{
         }
         const isPasswordMatch=compareSync(password,user.password);
 
-        if (!isPasswordMatch){
-            return next(new errorHandlerClass("Invalid Credentials",401,"Invalid Credentials",{identifier}))
-        }
-         await user.save();
-         // Generate a JWT token for the user with their ID and secret signature
-        const token=jwt.sign({_id:user._id},process.env.LOGIN_SECRET,{expiresIn:'14d'});
+        if (!isPasswordMatch){return next(new errorHandlerClass("Invalid Credentials",401,"Invalid Credentials",{identifier}))}
 
-        res.json({message: "Logged In Successfully",token})
-}
+        const sessionId = uuidv4();
+
+        const session = new Session({
+          sessionId,
+          userId: userInstance._id,
+        });
+
+        await session.save();
+
+        user.sessionId[0]
+          ? userInstance.sessionId.push(session._id)
+          : (userInstance.sessionId = [session._id]);
+
+        await user.save();
+        // Generate a JWT token for the user with their ID and secret signature
+        const token = generateJWT(user._id, sessionId);
+
+        const userToSend = userToUser(user);
+
+        res.json({ message: "Logged In Successfully", token, user: userToSend });
+};
 
 ////////////////////////// update account  //////////////////////////////
 
@@ -248,6 +281,15 @@ export const deleteUser = async(req, res, next) => {
 
 
 
+// load user
+// to retrive user on loading the page, from the jwt (the auth middlewear do that for us)
+export const loadUser = async (req, res, next) => {
+  const user = req.authUser;
 
+  if (!user)
+    return next(new errorHandlerClass("User not found", 404, "User not found"));
 
+  const userToSend = userToUser(user);
 
+  res.json({ message: "Valid token", user: userToSend });
+};

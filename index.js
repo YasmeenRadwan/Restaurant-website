@@ -10,14 +10,13 @@ import cors from 'cors';
  
 const app = express();
 
-if (process.env.NODE_ENV == 'prod') {
-    config({path : path.resolve('.prod.env')})
+if (process.env.NODE_ENV === 'prod') {
+    config({ path: path.resolve('.prod.env') });
+} else if (process.env.NODE_ENV === 'dev') {
+    config({ path: path.resolve('.dev.env') });
+} else {
+    config();
 }
-if (process.env.NODE_ENV == 'dev') {
-    config({path : path.resolve('.dev.env')})
-}
-
-config()
 
 
 let port = process.env.PORT;
