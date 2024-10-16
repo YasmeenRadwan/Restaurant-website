@@ -14,6 +14,7 @@ router.post('/signIn',errorHandle(userController.signIn));
 router.patch('/',auth(),validationMiddleware(updateSchema),errorHandle(userController.updateAccount))
 router.delete('/',auth(), errorHandle(userController.deleteAccount))
 router.get('/',auth(), errorHandle(userController.getAccountData))
+router.get('/me',auth(), errorHandle(userController.loadUser))
 router.put('/updatePassword',auth(),validationMiddleware(updatePasswordSchema), errorHandle(userController.updatePassword))
 router.post('/otpPassword', errorHandle(userController.otpPassword))
 router.post('/forgetPassword', validationMiddleware(forgetPasswordSchema),errorHandle(userController.forgetPassword))

@@ -1,7 +1,7 @@
 // auth middleware 
-import jwt from "jsonwebtoken";
 import User from "../../DB/Models/user.model.js";
 import { errorHandlerClass } from "../utils/error-class.utils.js";
+import { verifyJWT } from "../utils/jwt.utils.js";
 
 export const auth = () => {
     return async(req,res,next) => {
@@ -17,15 +17,27 @@ export const auth = () => {
         }
 
         const originalToken=token.split(" ")[1];
-        const decodedData =jwt.verify(originalToken,"accessTokenSignature");
+        const decodedData =verifyJWT(originalToken);
+        console.log(decodedData);
         if(!decodedData?._id){
             return next(new errorHandlerClass('Invalid Token Payload',400,'Invalid Token Payload'));
         }
 
-        const user=await User.findById(decodedData._id).select("-password")
+        const user=await User.findById(decodedData._id).populate("sessionId").select("-password")
         if(!user){
             return next(new errorHandlerClass('Please signUp',400,'Please signUp'));
         }
+
+        const validSession = !!user.sessionId?.find(
+            (session) => session.sessionId === decodedData.sessionId
+          );
+      
+          if (!validSession) {
+            return next(
+              new errorHandlerClass("Please login again", 400, "Please login again")
+            );
+          }
+
         req.authUser=user
         next()
     }

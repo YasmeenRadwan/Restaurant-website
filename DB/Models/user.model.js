@@ -17,6 +17,10 @@ const userSchema=new Schema(
             required:true,
             unique:true
         },
+        emailConfirmed: {
+          type: Boolean,
+          default: false,
+        },
         password:{
             type:String,
             required:true,
@@ -64,6 +68,23 @@ const userSchema=new Schema(
             enum:Object.values(systemRoles),
             default:"User"
         },
+        status: {
+          type: String,
+          enum: ["online", "offline"],
+          default: "offline",
+        },
+        sessionId: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Session",
+          },
+        ],
+        orders: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Orders",
+          },
+        ],
         otp: { type: String },
         otpExpires: { type: Date }
     },
