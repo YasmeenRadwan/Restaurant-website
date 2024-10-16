@@ -85,6 +85,30 @@ const userSchema=new Schema(
             ref: "Orders",
           },
         ],
+
+        cart: [
+            {
+              menuItem: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Menu", 
+                required: true,
+              },
+              quantity: {
+                type: Number,
+                required: true,
+                min: 1,
+                default: 1,
+              },
+              customizations: {
+                type: String, 
+                maxlength: 200,
+              },
+              totalPrice: {
+                type: Number,
+                min: 0,
+              }
+            },
+          ],
         otp: { type: String },
         otpExpires: { type: Date }
     },
@@ -92,5 +116,15 @@ const userSchema=new Schema(
         Timestamp:true
     }
 )
+
+userSchema.pre('save', async function (next) {
+    if (this.isModified('cart')) {
+      for (let item of this.cart) {
+        const menuItem = await mongoose.model('Menu').findById(item.menuItem);
+        item.totalPrice = menuItem.price * item.quantity;
+      }
+    }
+    next();
+  });
 
 export default mongoose.models.User || model("User", userSchema)
