@@ -85,7 +85,7 @@ const menuSchema=new Schema(
             required: true
           }
         });
-
+/*
 menuSchema.pre('save', function (next) {
   if (this.isModified('ratings')) {
 }else {
@@ -102,37 +102,38 @@ menuSchema.methods.calculateAverageRating = function() {
     this.averageRating = 0;
   }
 };
-
-export default mongoose.models.Menu || model("Menu", menuSchema)
+*/
 
 ////////////  update the menu count when a menu item is added//////////////////
 menuSchema.post('save', async function () {
-  const Category = mongoose.model('Category'); // Get the Category model
+  const Category = mongoose.model('Category');
 
   try {
-    // Count the number of menu items for this category
+    // Get the category document by the menu's categoryId
     const menuCount = await mongoose.model('Menu').countDocuments({ categoryId: this.categoryId });
 
-    // Fetch the current category
-    const category = await Category.findById(this.categoryId);
-    
-    // Update the Category's description with the menu count
-    const updatedDescription = `${category.description || ''} (Total items: ${menuCount})`; // Append count
-    await Category.findByIdAndUpdate(this.categoryId, {
-      description: updatedDescription
-    });
+    await Category.findByIdAndUpdate(this.categoryId, { description: `${menuCount}`});
   } catch (error) {
-    console.error('Error updating category description:', error);
+    return next(new errorHandlerClass("Error updating category description:'",400,"Error updating category description:'",error))
   }
 });
+
+
+export default mongoose.models.Menu || model("Menu", menuSchema)
+
+
 
 //////////// Pre-remove to update the menu count when a menu item is deleted//////////////////
 menuSchema.post('remove', async function () {
   const Category = mongoose.model('Category');
 
-  const menuCount = await mongoose.model('Menu').countDocuments({ category: this.category });
+  try {
+    // Get the category document by the menu's categoryId
+    const menuCount = await mongoose.model('Menu').countDocuments({ categoryId: this.categoryId });
 
-  await Category.findByIdAndUpdate(this.category, {
-      description: `${menuCount}`
-  });
+    await Category.findByIdAndUpdate(this.categoryId, { description: `${menuCount}`});
+    
+  } catch (error) {
+    return next(new errorHandlerClass("Error updating category description:'",400,"Error updating category description:'",error))
+  }
 });
