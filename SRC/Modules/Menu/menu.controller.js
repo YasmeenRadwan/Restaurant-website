@@ -49,3 +49,32 @@ export const createMenu=async(req,res,next)=>{
     res.json({message: "Menu Item created ",newMenu });
 
 }
+
+////////////////////////////// get Menu item by name  //////////////////////////////////////////
+export const getMenuByName  = async (req, res,next) => {
+    const {name} = req.params;
+
+    if (!name) {
+        return next(new errorHandlerClass("Menu Item name is required", 400, "Menu Item name is required"));
+    }
+
+    const menuItem = await Menu.findOne({ name});
+    if (!menuItem){
+          return next (new errorHandlerClass("Menu Item not found", 404, "Menu Item not found"));
+       }
+
+       res.json({ message: "Menu item data fetched successfully", menuItem });
+
+}
+
+////////////////////////////// get all Menu Items  //////////////////////////////////////////
+export const getAllMenu = async (req, res,next) => {
+
+      const allMenu = await Menu.find();
+
+      if (!allMenu.length === 0) {
+            return next (new errorHandlerClass("Error in getting Menu", 404, "Error in getting Menu"));
+         }
+         res.json({ message: "Menu data fetched successfully", allMenu });
+
+  }

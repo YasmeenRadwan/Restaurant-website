@@ -118,11 +118,6 @@ menuSchema.post('save', async function () {
   }
 });
 
-
-export default mongoose.models.Menu || model("Menu", menuSchema)
-
-
-
 //////////// Pre-remove to update the menu count when a menu item is deleted//////////////////
 menuSchema.post('remove', async function () {
   const Category = mongoose.model('Category');
@@ -137,3 +132,8 @@ menuSchema.post('remove', async function () {
     return next(new errorHandlerClass("Error updating category description:'",400,"Error updating category description:'",error))
   }
 });
+
+export default mongoose.models.Menu || model("Menu", menuSchema)
+
+
+

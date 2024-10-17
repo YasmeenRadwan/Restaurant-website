@@ -14,8 +14,8 @@ import * as menuController from './menu.controller.js';
 //import {validationMiddleware} from '../../Middleware/validation.middleware.js'
 
 router.post('/',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(menuController.createMenu));
-//router.get('/:name',auth(),authorization(systemRoles.ADMIN), errorHandle(menuController.getCategoryByName));
-//router.get('/',auth(),authorization(systemRoles.ADMIN), errorHandle(menuController.getAllCategories));
+router.get('/:name',auth(), errorHandle(menuController.getMenuByName));
+router.get('/',auth(), errorHandle(menuController.getAllMenu));
 
 
 

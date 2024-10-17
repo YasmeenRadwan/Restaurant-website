@@ -14,8 +14,8 @@ import * as categoryController from './category.controller.js';
 //import {validationMiddleware} from '../../Middleware/validation.middleware.js'
 
 router.post('/',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(categoryController.createCategory));
-router.get('/:name',auth(),authorization(systemRoles.ADMIN), errorHandle(categoryController.getCategoryByName));
-router.get('/',auth(),authorization(systemRoles.ADMIN), errorHandle(categoryController.getAllCategories));
+router.get('/:name',auth(), errorHandle(categoryController.getCategoryByName));
+router.get('/',auth(), errorHandle(categoryController.getAllCategories));
 
 
 
