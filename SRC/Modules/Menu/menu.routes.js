@@ -10,12 +10,11 @@ import { extensions } from "../../utils/file-extensions.utils.js";
 const router= Router();
 
 import * as menuController from './menu.controller.js';
-//import { signUpSchema , updateSchema ,updatePasswordSchema ,forgetPasswordSchema } from "./user.schema.js";
-//import {validationMiddleware} from '../../Middleware/validation.middleware.js'
 
 router.post('/',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(menuController.createMenu));
-router.get('/:name',auth(), errorHandle(menuController.getMenuByName));
-router.get('/',auth(), errorHandle(menuController.getAllMenu));
+router.get('/:name', errorHandle(menuController.getMenuByName));
+router.get('/category/:categoryId',errorHandle(menuController.getMenuForCategory));
+router.get('/',errorHandle(menuController.getAllMenu));
 
 
 

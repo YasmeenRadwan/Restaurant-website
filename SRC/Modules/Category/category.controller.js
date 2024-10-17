@@ -54,7 +54,7 @@ export const getAllCategories = async (req, res,next) => {
 
       const categories = await Category.find();
 
-      if (!categories.length === 0) {
+      if (categories.length === 0) {
             return next (new errorHandlerClass("Error in getting categories", 404, "Error in getting categories"));
          }
          res.json({ message: "categories data fetched successfully", categories });

@@ -4,7 +4,7 @@ import {cloudinaryConfig} from "../../utils/cloudinary.utils.js";
 import jwt from "jsonwebtoken";
 import { errorHandlerClass } from "../../utils/error-class.utils.js";
 
-////////////////////////////// create Category  //////////////////////////////////////////
+////////////////////////////// create Menu Item  //////////////////////////////////////////
 export const createMenu=async(req,res,next)=>{
 
    const category = await Category.findById(req.query.category);
@@ -68,13 +68,27 @@ export const getMenuByName  = async (req, res,next) => {
 }
 
 ////////////////////////////// get all Menu Items  //////////////////////////////////////////
-export const getAllMenu = async (req, res,next) => {
+export const getMenuForCategory = async (req, res,next) => {
+    const { categoryId } = req.params;
 
-      const allMenu = await Menu.find();
+    const Menuitems = await Menu.find({categoryId});
 
-      if (!allMenu.length === 0) {
-            return next (new errorHandlerClass("Error in getting Menu", 404, "Error in getting Menu"));
-         }
-         res.json({ message: "Menu data fetched successfully", allMenu });
+    if (Menuitems.length === 0) {
+        return next (new errorHandlerClass("Error in getting menu items for this category", 404, "Error in getting menu items for this category"));
+        }
+        res.json({ message: "menu items for this category fetched successfully", Menuitems });
 
   }
+
+
+  ////////////////////////////// get all Menu Items  //////////////////////////////////////////
+export const getAllMenu = async (req, res,next) => {
+
+    const allMenu = await Menu.find();
+
+    if (allMenu.length === 0) {
+          return next (new errorHandlerClass("Error in getting Menu", 404, "Error in getting Menu"));
+       }
+       res.json({ message: "Menu data fetched successfully", allMenu });
+
+}
