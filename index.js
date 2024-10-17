@@ -4,6 +4,7 @@ import { globalResponse } from './SRC/Middleware/error-handle.middleware.js';
 
 import userRouter from './SRC/Modules/User/user.routes.js';
 import categoryRouter from './SRC/Modules/Category/category.routes.js';
+import menuRouter from './SRC/Modules/Menu/menu.routes.js';
 
 import { config } from 'dotenv';
 import path from "path";
@@ -27,6 +28,7 @@ app.use(express.json())
 
 app.use('/user',userRouter);
 app.use('/category',categoryRouter);
+app.use('/menu',menuRouter);
 
 app.use(globalResponse);
 

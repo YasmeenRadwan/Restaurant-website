@@ -20,7 +20,8 @@ router.post('/otpPassword', errorHandle(userController.otpPassword))
 router.post('/forgetPassword', validationMiddleware(forgetPasswordSchema),errorHandle(userController.forgetPassword))
 
 // admin routes
-router.get('/profile/:userProfileId',auth(),authorization(systemRoles.ADMIN),errorHandle(userController.getProfileData)) 
+router.get('/profile/:userProfileId',auth(),authorization(systemRoles.ADMIN),errorHandle(userController.getProfileData))
+router.get('/allUsers',auth(),authorization(systemRoles.ADMIN),errorHandle(userController.getAllUsers))  
 router.patch('/updateUser/:userProfileId',auth(),authorization(systemRoles.ADMIN),errorHandle(userController.updateUser)) 
 router.delete('/deleteUser/:userProfileId',auth(),authorization(systemRoles.ADMIN),errorHandle(userController.deleteUser))
 

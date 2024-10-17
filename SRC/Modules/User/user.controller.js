@@ -136,6 +136,18 @@ export const getAccountData = async (req,res,next) => {
          // return user profile
          res.json({ message: "Account data fetched successfully", userData });
 }
+////////////////////////////get all profile data (admin) ///////////////////////////////////////////
+export const getAllUsers = async (req,res,next) => {
+
+    const usersData = await User.find().select('firstName lastName email mobileNumber address -_id');
+    console.log(usersData);
+
+    if (usersData.length===0) {
+            return next(new errorHandlerClass("Error in getting users data", 404, "Error in getting users data"));
+         }
+         res.json({ message: "users data fetched successfully", usersData })
+
+        }
 
 ////////////////////////////  get Profile data (admin if needed) ///////////////////////////////////////////
 export const getProfileData = async (req,res,next) => {

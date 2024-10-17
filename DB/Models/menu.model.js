@@ -29,14 +29,21 @@ const menuSchema=new Schema(
           description: {
             type: String
           },
-          category: {
+          categoryId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Category',  
             required: true
           },
-          image: {
-            type: String,
-            required: true  
+          image : {
+            secure_url : {
+                type : String,
+                required : true
+            },
+            public_id : {
+                type : String,
+                required : true,
+                unique : true
+            }
           },
           available: {
             type: Boolean,
@@ -70,9 +77,13 @@ const menuSchema=new Schema(
           },
           editedBy: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            required: true,
+            ref: 'User'
           },
+          createdBy:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+          }
         });
 
 menuSchema.pre('save', function (next) {
@@ -96,14 +107,23 @@ export default mongoose.models.Menu || model("Menu", menuSchema)
 
 ////////////  update the menu count when a menu item is added//////////////////
 menuSchema.post('save', async function () {
-  const Category = mongoose.model('Category'); 
+  const Category = mongoose.model('Category'); // Get the Category model
 
-  // Count the number of menuitems for category
-  const menuCount = await mongoose.model('Menu').countDocuments({ category: this.category });
+  try {
+    // Count the number of menu items for this category
+    const menuCount = await mongoose.model('Menu').countDocuments({ categoryId: this.categoryId });
 
-  await Category.findByIdAndUpdate(this.category, {
-      description: `${menuCount}`
-  });
+    // Fetch the current category
+    const category = await Category.findById(this.categoryId);
+    
+    // Update the Category's description with the menu count
+    const updatedDescription = `${category.description || ''} (Total items: ${menuCount})`; // Append count
+    await Category.findByIdAndUpdate(this.categoryId, {
+      description: updatedDescription
+    });
+  } catch (error) {
+    console.error('Error updating category description:', error);
+  }
 });
 
 //////////// Pre-remove to update the menu count when a menu item is deleted//////////////////
