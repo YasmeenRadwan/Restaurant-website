@@ -120,7 +120,7 @@ export const deleteAccount = async(req, res, next) => {
          // delete user 
         const deletedUser = await User.findByIdAndDelete(_id);
         if (!deletedUser) {
-            return next(new errorHandlerClass("User not found", 404, "User not found"));
+            return next(new errorHandlerClass("Account not found", 404, "Account not found"));
         }
         res.json({ message: "Account deleted successfully" });
 };
