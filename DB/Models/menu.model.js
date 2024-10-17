@@ -1,4 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
+
+const {Schema , model} =mongoose;
 
 const ratingSchema = new mongoose.Schema({
   user: {
@@ -8,83 +10,80 @@ const ratingSchema = new mongoose.Schema({
   },
   rating: {
     type: Number,
-    // required: true,
     min: 0,
     max: 5,
   },
 }, { _id: false }); 
 
-const menuItemSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  description: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  category: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  price: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
-  orderedTimes: {
-    type: Number,
-    default: 0,
-    min: 0,
-  },
-  ratings: [ratingSchema],
-
-  averageRating: {
-    type: Number,
-    default: 0,
-    min: 0,
-    max: 5,
-  },
-  images: [{
-    type: String,
-    trim: true,
-  }],
-  available: {
-    type: Boolean,
-    default: true,
-  },
-  ingredients: [
+const menuSchema=new Schema(
     {
-      type: String,
-      trim: true,
-    },
-  ],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-  },
-  editedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-});
+        name: {
+            type: String,
+            required: true
+          },
+          price: {
+            type: Number,
+            required: true,
+            min:0
+          },
+          description: {
+            type: String
+          },
+          category: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Category',  
+            required: true
+          },
+          image: {
+            type: String,
+            required: true  
+          },
+          available: {
+            type: Boolean,
+            default: true  
+          },
+          orderedTimes: {
+            type: Number,
+            default: 0,
+            min: 0,
+          },
+          ratings: [ratingSchema],
+        
+          averageRating: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: 5,
+          },
+          ingredients: [
+            {
+              type: String,
+              trim: true,
+            },
+          ],
+          createdAt: {
+            type: Date,
+            default: Date.now,
+          },
+          updatedAt: {
+            type: Date,
+          },
+          editedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+          },
+        });
 
-menuItemSchema.pre('save', function (next) {
+menuSchema.pre('save', function (next) {
   if (this.isModified('ratings')) {
 }else {
     this.updatedAt = Date.now();
 }
   next();
 });
-
-menuItemSchema.methods.calculateAverageRating = function() {
+        
+menuSchema.methods.calculateAverageRating = function() {
   if (this.ratings.length > 0) {
     const sum = this.ratings.reduce((total, rating) => total + rating.rating, 0);
     this.averageRating = (sum / this.ratings.length).toFixed(1);
@@ -93,6 +92,27 @@ menuItemSchema.methods.calculateAverageRating = function() {
   }
 };
 
-const Menu = mongoose.model('Menu', menuItemSchema);
+export default mongoose.models.Menu || model("Menu", menuSchema)
 
-export default Menu;
+////////////  update the menu count when a menu item is added//////////////////
+menuSchema.post('save', async function () {
+  const Category = mongoose.model('Category'); 
+
+  // Count the number of menuitems for category
+  const menuCount = await mongoose.model('Menu').countDocuments({ category: this.category });
+
+  await Category.findByIdAndUpdate(this.category, {
+      description: `${menuCount}`
+  });
+});
+
+//////////// Pre-remove to update the menu count when a menu item is deleted//////////////////
+menuSchema.post('remove', async function () {
+  const Category = mongoose.model('Category');
+
+  const menuCount = await mongoose.model('Menu').countDocuments({ category: this.category });
+
+  await Category.findByIdAndUpdate(this.category, {
+      description: `${menuCount}`
+  });
+});
