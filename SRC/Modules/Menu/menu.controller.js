@@ -27,7 +27,7 @@ export const createMenu=async(req,res,next)=>{
     const isMenuExist = await Menu.findOne({ name });
 
     if (isMenuExist) {
-        return next(new errorHandlerClass("Menu already exists",400,"Menu already exists",{name}))
+        return next(new errorHandlerClass("Menu Item already exists",400,"Menu item already exists",{name}))
     }
 
     const {secure_url,public_id} = await cloudinaryConfig().uploader.upload(req.file.path,{

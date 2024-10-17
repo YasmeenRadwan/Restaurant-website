@@ -139,7 +139,7 @@ export const getAccountData = async (req,res,next) => {
 ////////////////////////////get all profile data (admin) ///////////////////////////////////////////
 export const getAllUsers = async (req,res,next) => {
 
-    const usersData = await User.find().select('firstName lastName email mobileNumber address');
+    const usersData = await User.find().select('firstName lastName email mobileNumber address role');
     console.log(usersData);
 
     if (usersData.length===0) {
