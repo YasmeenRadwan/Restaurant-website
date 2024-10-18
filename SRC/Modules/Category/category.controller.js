@@ -99,8 +99,7 @@ export const updateCategory = async (req, res, next) => {
     // Save the updated category in MongoDB
     const updatedCategory = await category.save();
 
-    res.status(200).json({
-        message: "Category updated successfully",updatedCategory});
+    res.status(200).json({message: "Category updated successfully",updatedCategory});
 };
   ////////////////////////////// delete Category  //////////////////////////////////////////
 

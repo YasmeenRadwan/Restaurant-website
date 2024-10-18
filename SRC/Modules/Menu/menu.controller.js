@@ -70,7 +70,7 @@ export const getMenuById  = async (req, res,next) => {
 
 }
 
-////////////////////////////// get all Menu Items  //////////////////////////////////////////
+////////////////////////////// get all Menu Items for a category  //////////////////////////////////////////
 export const getMenuForCategory = async (req, res,next) => {
     const { categoryId } = req.params;
 
