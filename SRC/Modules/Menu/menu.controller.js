@@ -139,7 +139,7 @@ export const updateMenuItem = async(req,res,next) => {
         menu.image.secure_url = secure_url;
         }
 
-        menu.updatedBy = updatedBy;
+        menu.editedBy = updatedBy;
     
     const updatedMenu = await menu.save();
     res.json({ message: "Menu data updated successfully", updatedMenu });
