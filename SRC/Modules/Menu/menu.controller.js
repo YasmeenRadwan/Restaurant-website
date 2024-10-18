@@ -135,7 +135,6 @@ export const updateMenuItem = async(req,res,next) => {
             public_id: splitedPublicId,
         }
         );
-        console.log("imag",menu.image);
         menu.image.secure_url = secure_url;
         }
 

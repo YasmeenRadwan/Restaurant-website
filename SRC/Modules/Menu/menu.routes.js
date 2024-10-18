@@ -16,7 +16,7 @@ router.post('/',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExte
 router.patch('/:_id',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(menuController.updateMenuItem));
 router.delete('/:_id',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(menuController.deleteMenuItem));
 
-router.get('/:_id', errorHandle(menuController.getMenuByName));
+router.get('/:_id', errorHandle(menuController.getMenuById));
 router.get('/category/:categoryId',errorHandle(menuController.getMenuForCategory));
 router.get('/',errorHandle(menuController.getAllMenu));
 
