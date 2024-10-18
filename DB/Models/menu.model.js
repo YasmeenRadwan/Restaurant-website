@@ -45,6 +45,11 @@ const menuSchema=new Schema(
                 unique : true
             }
           },
+          customId :{
+            type : String,
+            required : true,
+            unique : true
+        },
           available: {
             type: Boolean,
             default: true  
@@ -118,18 +123,21 @@ menuSchema.post('save', async function () {
   }
 });
 
-//////////// Pre-remove to update the menu count when a menu item is deleted//////////////////
-menuSchema.post('remove', async function () {
-  const Category = mongoose.model('Category');
+//////////// post to update the menu count when a menu item is deleted//////////////////
+menuSchema.post('findOneAndDelete', async function (doc) {
+  if (doc) {  // 'doc' refers to the document that was just deleted
+    const Category = mongoose.model('Category');
 
-  try {
-    // Get the category document by the menu's categoryId
-    const menuCount = await mongoose.model('Menu').countDocuments({ categoryId: this.categoryId });
+    try {
+      // Count remaining menu items in the same category
+      const menuCount = await mongoose.model('Menu').countDocuments({ categoryId: doc.categoryId });
 
-    await Category.findByIdAndUpdate(this.categoryId, { description: `${menuCount}`});
-    
-  } catch (error) {
-    return next(new errorHandlerClass("Error updating category description:'",400,"Error updating category description:'",error))
+      // Update the category's description with the new menu item count
+      await Category.findByIdAndUpdate(doc.categoryId, { description: `${menuCount}`});
+      
+    } catch (error) {
+      console.error("Error updating category description:", error);
+    }
   }
 });
 

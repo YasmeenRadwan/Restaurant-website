@@ -11,8 +11,12 @@ const router= Router();
 
 import * as menuController from './menu.controller.js';
 
+//admin apis
 router.post('/',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(menuController.createMenu));
-router.get('/:name', errorHandle(menuController.getMenuByName));
+router.patch('/:_id',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(menuController.updateMenuItem));
+router.delete('/:_id',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(menuController.deleteMenuItem));
+
+router.get('/:_id', errorHandle(menuController.getMenuByName));
 router.get('/category/:categoryId',errorHandle(menuController.getMenuForCategory));
 router.get('/',errorHandle(menuController.getAllMenu));
 

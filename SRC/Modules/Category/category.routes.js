@@ -10,12 +10,14 @@ import { extensions } from "../../utils/file-extensions.utils.js";
 const router= Router();
 
 import * as categoryController from './category.controller.js';
-//import { signUpSchema , updateSchema ,updatePasswordSchema ,forgetPasswordSchema } from "./user.schema.js";
-//import {validationMiddleware} from '../../Middleware/validation.middleware.js'
 
+//admin apis
 router.post('/',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(categoryController.createCategory));
-router.get('/:name',auth(), errorHandle(categoryController.getCategoryByName));
-router.get('/',auth(), errorHandle(categoryController.getAllCategories));
+router.patch('/:_id',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(categoryController.updateCategory));
+router.delete('/:_id',auth(),authorization(systemRoles.ADMIN), errorHandle(categoryController.deleteCategory));
+
+router.get('/:name', errorHandle(categoryController.getCategoryByName));
+router.get('/', errorHandle(categoryController.getAllCategories));
 
 
 

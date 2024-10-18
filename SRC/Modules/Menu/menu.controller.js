@@ -1,6 +1,7 @@
 import Menu from "../../../DB/Models/menu.model.js";
 import Category from "../../../DB/Models/category.model.js";
 import {cloudinaryConfig} from "../../utils/cloudinary.utils.js";
+import {nanoid} from "nanoid";
 import jwt from "jsonwebtoken";
 import { errorHandlerClass } from "../../utils/error-class.utils.js";
 
@@ -30,13 +31,15 @@ export const createMenu=async(req,res,next)=>{
         return next(new errorHandlerClass("Menu Item already exists",400,"Menu item already exists",{name}))
     }
 
-    const {secure_url,public_id} = await cloudinaryConfig().uploader.upload(req.file.path,{
-        public_id: `${name}`, 
-        folder : `${process.env.UPLOADS_FOLDER}/Categories/${category.name}/Items`,
-    });
+    const customId= nanoid(4);
+    const {secure_url , public_id} = await cloudinaryConfig().uploader.upload(req.file.path,{
+        folder : `${process.env.UPLOADS_FOLDER}/Categories/${category.customId}/${customId}`,
+        }
+    )
 
     const menuInstance= new Menu({name,
         image: {secure_url,public_id} ,
+        customId,
         categoryId :category._id,
         createdBy,
         price,
@@ -50,15 +53,15 @@ export const createMenu=async(req,res,next)=>{
 
 }
 
-////////////////////////////// get Menu item by name  //////////////////////////////////////////
-export const getMenuByName  = async (req, res,next) => {
-    const {name} = req.params;
+////////////////////////////// get Menu item by Id  //////////////////////////////////////////
+export const getMenuById  = async (req, res,next) => {
+    const {_id} = req.params;
 
-    if (!name) {
-        return next(new errorHandlerClass("Menu Item name is required", 400, "Menu Item name is required"));
+    if (!_id) {
+        return next(new errorHandlerClass("Menu Item is required", 400, "Menu Item is required"));
     }
 
-    const menuItem = await Menu.findOne({ name});
+    const menuItem = await Menu.findById(_id)
     if (!menuItem){
           return next (new errorHandlerClass("Menu Item not found", 404, "Menu Item not found"));
        }
@@ -91,4 +94,68 @@ export const getAllMenu = async (req, res,next) => {
        }
        res.json({ message: "Menu data fetched successfully", allMenu });
 
+}
+
+  ////////////////////////////// update Menu Items  //////////////////////////////////////////
+
+export const updateMenuItem = async(req,res,next) => {
+    const {_id} = req.params;
+
+    const updatedBy  = req.authUser._id; 
+
+    const { 
+    name,
+    price,
+    description,
+    available,
+    ingredients} = req.body;
+
+    const menu = await Menu.findById(_id).populate('categoryId');
+    console.log("menu",menu);
+    
+    if(!menu){
+        return next(new errorHandlerClass('menu item not found',404,'menu item not found'));
+    }
+
+    if (name) menu.name = name;
+    if (price) menu.price = price;
+    if (description) menu.description = description;
+    if (available !== undefined) menu.available = available;  
+    if (ingredients) menu.ingredients = ingredients;
+    
+    if(req.file){
+        const splitedPublicId = menu.image.public_id.split(`${menu.customId}/`)[1];
+        console.log(splitedPublicId);
+        
+      
+        const { secure_url } = await cloudinaryConfig().uploader.upload(
+        req.file.path,
+        {
+            folder: `${process.env.UPLOADS_FOLDER}/Categories/${menu.categoryId.customId}/${menu.customId}`,
+            public_id: splitedPublicId,
+        }
+        );
+        console.log("imag",menu.image);
+        menu.image.secure_url = secure_url;
+        }
+
+        menu.updatedBy = updatedBy;
+    
+    const updatedMenu = await menu.save();
+    res.json({ message: "Menu data updated successfully", updatedMenu });
+}
+
+//////////////////////////// delete Menu Items  //////////////////////////////////////////
+export const deleteMenuItem = async(req,res,next) => {
+    const {_id} = req.params;
+    const menu = await Menu.findByIdAndDelete(_id).populate('categoryId');
+
+    if(!menu){
+        return next(new errorHandlerClass('menu item not found',404,'menu item not found'));
+    }
+    const menuItemPath=`${process.env.UPLOADS_FOLDER}/Categories/${menu.categoryId.customId}/${menu.customId}`;
+    await cloudinaryConfig().api.delete_resources_by_prefix(menuItemPath);
+    await cloudinaryConfig().api.delete_folder(menuItemPath);
+
+    res.json({message: "menu item deleted successfully"});
 }
