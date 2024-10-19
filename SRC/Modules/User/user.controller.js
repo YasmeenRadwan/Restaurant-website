@@ -6,41 +6,45 @@ import { errorHandlerClass } from "../../utils/error-class.utils.js";
 import { v4 as uuidv4 } from "uuid";
 import { generateJWT } from "../../utils/jwt.utils.js";
 import { userToUser } from "../../utils/userObjectProcess.utils.js";
+import Address from "../../../DB/Models/address.model.js";
 
-////////////////////// signUp  ////////////////////////////
+//////////////////////////// signUp  /////////////////////////////////
 export const signUp=async(req,res,next)=>{
  
-        const{firstName,lastName,email,password,confirmPassword,mobileNumber,address,role}=req.body;
-        // Insure the Email exists
-        const isEmailExist=await User.findOne({email})
-        
-        if (isEmailExist){
-          return next(new errorHandlerClass("Email Already Exists",400,"Email Already Exists",{email}))
-        }
-        const hashedPassword=hashSync(password,+process.env.SALT_ROUNDS);
+    const{firstName,lastName,email,password,mobileNumber,country, city ,buildingNumber,floorNumber,addressLabel,role}=req.body;
+    // Insure the Email exists
+    const isEmailExist=await User.findOne({email})
+    
+    if (isEmailExist){
+      return next(new errorHandlerClass("Email Already Exists",400,"Email Already Exists",{email}))
+    }
+    const hashedPassword=hashSync(password,+process.env.SALT_ROUNDS);
 
-        const userInstance= new User({firstName,lastName,email,password:hashedPassword,mobileNumber,address,role});
+    const userInstance= new User({firstName,lastName,email,password:hashedPassword,mobileNumber,role});
 
-        const sessionId = uuidv4();
+    const sessionId = uuidv4();
 
-        const sessions = new Session({
-          sessionId,
-          userId: userInstance._id,
-        });
-      
-        await sessions.save();
-      
-        userInstance.sessionId[0]
-          ? userInstance.sessionId.push(sessions._id)
-          : (userInstance.sessionId = [sessions._id]);
-      
-        const token = generateJWT(userInstance._id, sessionId);
-        const newUser = await userInstance.save();
-        const userToSend = userToUser(newUser);
-      
-        res.json({ message: "user created ", token, newUser: userToSend });
+    const sessions = new Session({
+      sessionId,
+      userId: userInstance._id,
+    });
+  
+    await sessions.save();
+  
+    userInstance.sessionId[0]
+      ? userInstance.sessionId.push(sessions._id)
+      : (userInstance.sessionId = [sessions._id]);
+  
+    const token = generateJWT(userInstance._id, sessionId);
+    const newUser = await userInstance.save();
+    const userToSend = userToUser(newUser);
+    // save address as default
+    const addressInstance=new Address({userId:userInstance._id,
+        country, city ,buildingNumber,floorNumber,addressLabel,isDefault: true});
+    const savedAddress=addressInstance.save();
+  
+    res.json({ message: "user created ", token, newUser: userToSend });
 }
-
 //////////////////////// signIn with email or mobile number/////////////////////////
 export const signIn=async(req,res,next)=>{
    
@@ -85,7 +89,7 @@ export const updateAccount= async(req,res,next)=>{
         
         const {_id}=req.authUser._id;
   
-        const {email , mobileNumber ,address, lastName , firstName}=req.body;
+        const {email , mobileNumber, lastName , firstName}=req.body;
         // Check for existing users with the new email or mobileNumber
         if (email) {
             const emailUser = await User.findOne({ email, _id: { $ne: _id } });
@@ -101,7 +105,7 @@ export const updateAccount= async(req,res,next)=>{
             }
         }
         const updatedUser=await User.findOneAndUpdate(_id,
-            {email , mobileNumber ,address, lastName , firstName},
+            {email , mobileNumber, lastName , firstName},
             {new:true});
         if (!updatedUser){
             return next(new errorHandlerClass("User not found",404,"User not found"))
@@ -129,7 +133,7 @@ export const deleteAccount = async(req, res, next) => {
 export const getAccountData = async (req,res,next) => {
     const { _id } = req.authUser;
         
-         const userData = await User.findById(_id);
+         const userData = await User.findById(_id).populate('addresses');
          if (!userData) {
             return next(new errorHandlerClass("Error in getting data", 404, "Error in getting data"));
          }
@@ -139,7 +143,7 @@ export const getAccountData = async (req,res,next) => {
 ////////////////////////////get all profile data (admin) ///////////////////////////////////////////
 export const getAllUsers = async (req,res,next) => {
 
-    const usersData = await User.find().select('firstName lastName email mobileNumber address role');
+    const usersData = await User.find().select('firstName lastName email mobileNumber role');
     console.log(usersData);
 
     if (usersData.length===0) {
@@ -154,7 +158,7 @@ export const getProfileData = async (req,res,next) => {
     const { userProfileId }= req.params;
     console.log(userProfileId);
 
-    const userProfileData = await User.findById(userProfileId).select('firstName lastName email mobileNumber address -_id');
+    const userProfileData = await User.findById(userProfileId).select('firstName lastName email mobileNumber -_id').populate('addresses');
     console.log(userProfileData);
 
     if (!userProfileData) {
@@ -242,7 +246,7 @@ export const updateUser= async(req,res,next)=>{
         
     const { userProfileId }= req.params;
 
-    const {email , mobileNumber ,address, lastName , firstName}=req.body;
+    const {email , mobileNumber , lastName , firstName}=req.body;
     // Check for existing users with the new email or mobileNumber
     if (email) {
         const emailUser = await User.findOne({ email, _id: { $ne: userProfileId} });
@@ -258,7 +262,7 @@ export const updateUser= async(req,res,next)=>{
         }
     }
     const updatedUser=await User.findOneAndUpdate({_id:userProfileId},
-        {email , mobileNumber ,address, lastName , firstName},
+        {email , mobileNumber , lastName , firstName},
         {new:true});
     if (!updatedUser){
         return next(new errorHandlerClass("User not found",404,"User not found"))
@@ -274,6 +278,9 @@ export const deleteUser = async(req, res, next) => {
      if (!user) {
         return next(new errorHandlerClass("Error in delete user", 404, "Error in delete user"));
      }
+
+      // Delete all user addresses 
+      await Address.deleteMany({ userId: userProfileId });
      // delete user 
     const deletedUser = await User.findByIdAndDelete({_id:userProfileId});
     if (!deletedUser) {

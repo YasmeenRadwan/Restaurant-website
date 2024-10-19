@@ -7,7 +7,7 @@ const router= Router();
 
 import * as userController from './user.controller.js'
 import { signUpSchema , updateSchema ,updatePasswordSchema ,forgetPasswordSchema } from "./user.schema.js";
-import {validationMiddleware} from '../../Middleware/validation.middleware.js'
+import {validationMiddleware} from '../../Middleware/validation.middleware.js';
 
 router.post('/signUp',validationMiddleware(signUpSchema), errorHandle(userController.signUp))
 router.post('/signIn',errorHandle(userController.signIn));
