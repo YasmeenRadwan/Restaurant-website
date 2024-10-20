@@ -64,7 +64,7 @@ export const signIn=async(req,res,next)=>{
             $or: [
               { email: identifier },
               { mobileNumber: identifier },],
-            });
+            }).populate('addresses');;
         if (!user){
             return next(new errorHandlerClass("Invalid Credentials",401,"Invalid Credentials",{identifier}))
         }
