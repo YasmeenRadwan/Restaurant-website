@@ -42,9 +42,9 @@ export const auth = () => {
         req.authUser=user
         next();
         } catch (error) {
-            console.log(error);
-            return next(new errorHandlerClass('Server Error',500,err.message));
-            
+            console.log(error.message);
+            //return next(new errorHandlerClass('Server Error',500,err.message)); //it gonna be invalid token (not server error) 
+            return next(new errorHandlerClass('Invalid Token',401,'Invalid Token'))
         }
     }
 }                   
