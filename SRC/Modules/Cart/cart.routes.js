@@ -13,6 +13,12 @@ router.post(
   errorHandle(cartController.updateCart),
 );
 router.delete(
+  "/clear",
+  auth(),
+  hasCartMiddleware,
+  errorHandle(cartController.clearCart),
+);
+router.delete(
   "/:_id",
   auth(),
   hasCartMiddleware,
@@ -23,12 +29,6 @@ router.get(
   auth(),
   hasCartMiddleware,
   errorHandle(cartController.getCart),
-);
-router.delete(
-  "/clear",
-  auth(),
-  hasCartMiddleware,
-  errorHandle(cartController.clearCart),
 );
 
 export default router;
