@@ -37,7 +37,8 @@ export const signUp=async(req,res,next)=>{
   
     const token = generateJWT(userInstance._id, sessionId);
     const newUser = await userInstance.save();
-    const userToSend = userToUser(newUser);
+   // const userToSend = userToUser(newUser);
+
     // save address as default
     const addressInstance=new Address({userId:userInstance._id,
         country, city ,buildingNumber,floorNumber,addressLabel,isDefault: true});
@@ -48,8 +49,12 @@ export const signUp=async(req,res,next)=>{
         { $push: { addresses: addressInstance._id } } // Add the address ID to the user's addresses array
     );
 
-  
-    res.json({ message: "user created ", token, newUser: userToSend ,address: savedAddress});
+    const updatedUser = await User.findById(newUser._id).populate('addresses');
+
+    // Format the user data to send in the response
+    const userToSend = userToUser(updatedUser);
+
+    res.json({ message: "user created ", token, newUser: userToSend });
 }
 //////////////////////// signIn with email or mobile number/////////////////////////
 export const signIn=async(req,res,next)=>{
