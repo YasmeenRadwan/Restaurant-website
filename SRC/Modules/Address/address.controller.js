@@ -60,7 +60,7 @@ export const editAddress = async (req, res, next) => {
     console.log(updatedAddress);
     
     if (!updatedAddress) {
-        return next(new errorHandlerClass("Address not found", 404, "Address not found"));
+        return next(new errorHandlerClass("Error in updating the address", 404, "Error in updating the address"));
     }
     res.json({ message: "Address updated successfully", address });
 };

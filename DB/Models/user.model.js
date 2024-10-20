@@ -71,7 +71,7 @@ const userSchema=new Schema(
         Timestamp:true
     }
 )
-
+/*
 userSchema.pre('save', async function (next) {
  
     if(this.isModified('password')){
@@ -80,7 +80,7 @@ userSchema.pre('save', async function (next) {
     next();
   });
 
-
+*/
 
 
 export default mongoose.models.User || model("User", userSchema)
