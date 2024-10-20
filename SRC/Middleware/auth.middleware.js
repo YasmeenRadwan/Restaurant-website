@@ -5,7 +5,8 @@ import { verifyJWT } from "../utils/jwt.utils.js";
 
 export const auth = () => {
     return async(req,res,next) => {
-    console.log("auth");
+        try {
+            console.log("auth");
         const {token} = req.headers;
         if(!token){
             return res.status(400).json({message:"unauthenticated , Please signIn first"})
@@ -39,6 +40,11 @@ export const auth = () => {
           }
 
         req.authUser=user
-        next()
+        next();
+        } catch (error) {
+            console.log(error);
+            return next(new errorHandlerClass('Server Error',500,err.message));
+            
+        }
     }
 }                   
