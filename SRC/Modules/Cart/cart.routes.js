@@ -24,7 +24,7 @@ router.get(
   hasCartMiddleware,
   errorHandle(cartController.getCart),
 );
-router.post(
+router.delete(
   "/clear",
   auth(),
   hasCartMiddleware,
