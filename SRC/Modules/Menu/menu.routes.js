@@ -6,14 +6,17 @@ import { systemRoles } from "../../utils/system-roles.utils.js";
 import {multerHost} from "../../Middleware/multer.middleware.js";
 import { extensions } from "../../utils/file-extensions.utils.js";
 
+import {validationMiddleware} from '../../Middleware/validation.middleware.js';
+import { menuSchema } from "./menu.schema.js";
+
 
 const router= Router();
 
 import * as menuController from './menu.controller.js';
 
 //admin apis
-router.post('/',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(menuController.createMenu));
-router.patch('/:_id',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(menuController.updateMenuItem));
+router.post('/',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),validationMiddleware(menuSchema),errorHandle(menuController.createMenu));
+router.patch('/:_id',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),validationMiddleware(menuSchema),errorHandle(menuController.updateMenuItem));
 router.delete('/:_id',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(menuController.deleteMenuItem));
 
 router.get('/:_id', errorHandle(menuController.getMenuById));

@@ -6,14 +6,17 @@ import { systemRoles } from "../../utils/system-roles.utils.js";
 import {multerHost} from "../../Middleware/multer.middleware.js";
 import { extensions } from "../../utils/file-extensions.utils.js";
 
+import {validationMiddleware} from '../../Middleware/validation.middleware.js';
+import { categorySchema } from "./category.schema.js";
+
 
 const router= Router();
 
 import * as categoryController from './category.controller.js';
 
 //admin apis
-router.post('/',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(categoryController.createCategory));
-router.patch('/:_id',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(categoryController.updateCategory));
+router.post('/',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),validationMiddleware(categorySchema),errorHandle(categoryController.createCategory));
+router.patch('/:_id',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),validationMiddleware(categorySchema),errorHandle(categoryController.updateCategory));
 router.delete('/:_id',auth(),authorization(systemRoles.ADMIN), errorHandle(categoryController.deleteCategory));
 
 router.get('/:name', errorHandle(categoryController.getCategoryByName));

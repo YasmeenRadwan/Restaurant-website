@@ -64,7 +64,8 @@ export const signIn=async(req,res,next)=>{
             $or: [
               { email: identifier },
               { mobileNumber: identifier },],
-            }).populate('addresses');;
+            }).populate('addresses');
+            console.log("111",user);
         if (!user){
             return next(new errorHandlerClass("Invalid Credentials",401,"Invalid Credentials",{identifier}))
         }
@@ -84,6 +85,8 @@ export const signIn=async(req,res,next)=>{
         user.sessionId[0]
           ? user.sessionId.push(session._id)
           : (user.sessionId = [session._id]);
+          console.log(user);
+          
 
         await user.save();
         // Generate a JWT token for the user with their ID and secret signature
