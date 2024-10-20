@@ -41,9 +41,15 @@ export const signUp=async(req,res,next)=>{
     // save address as default
     const addressInstance=new Address({userId:userInstance._id,
         country, city ,buildingNumber,floorNumber,addressLabel,isDefault: true});
-    const savedAddress=addressInstance.save();
+    const savedAddress= await addressInstance.save();
+
+    await User.updateOne(
+        { _id: userInstance._id },
+        { $push: { addresses: addressInstance._id } } // Add the address ID to the user's addresses array
+    );
+
   
-    res.json({ message: "user created ", token, newUser: userToSend });
+    res.json({ message: "user created ", token, newUser: userToSend ,address: savedAddress});
 }
 //////////////////////// signIn with email or mobile number/////////////////////////
 export const signIn=async(req,res,next)=>{
@@ -214,12 +220,11 @@ export const otpPassword = async (req,res,next) => {
         subject:'Password Reset OTP',
         textMessage:`Your OTP is ${otp}`
     })
-    console.log("isEmailSent",isEmailSent);
 
     if(isEmailSent.rejected.length) {
         return res.json("Verification Failed")
     }
-     res.json("OTP sent successfully")
+     res.json({message:"OTP sent successfully"})
     }
 
 /////////////////////////////////////forgetPassword////////////////////////////////////
@@ -236,9 +241,10 @@ export const otpPassword = async (req,res,next) => {
         user.password = hashedPassword;
         user.otp = undefined;
         user.otpExpires = undefined;
+
         await user.save();
     
-        res.json('Password reset successfully');
+        res.json({message:'Password reset successfully'});
     }
 
 ////////////////////////////  update user Profile data (admin if needed) ///////////////////////////////////////////
