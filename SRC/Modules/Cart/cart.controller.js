@@ -93,7 +93,7 @@ export const getCart = async (req, res, next) => {
 
   const cart = await Cart.findById(user.cart).populate({
     path: "cart.menuItem",
-    select: "name price description",
+    select: "name price description image averageRating ingredients available categoryId",
   });
 
   if (!cart) {
