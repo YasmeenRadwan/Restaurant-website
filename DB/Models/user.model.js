@@ -15,6 +15,7 @@ const userSchema=new Schema(
         },
         email:{
             type:String,
+            lowercase: true,
             required:true,
             unique:true
         },
@@ -71,6 +72,16 @@ const userSchema=new Schema(
         Timestamp:true
     }
 )
+
+userSchema.pre('save', async function (next) {
+  
+  // Convert email to lowercase
+  if (this.isModified('email')) {
+    this.email = this.email.toLowerCase();
+  }
+
+  next();
+});
 /*
 userSchema.pre('save', async function (next) {
  
