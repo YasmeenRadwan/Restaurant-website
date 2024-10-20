@@ -80,6 +80,10 @@ export const updateCart = async (req, res, next) => {
   }
 
   await cart.save();
+  await cart.populate({
+    path: "cart.menuItem",
+    select: "name price description image averageRating ingredients available categoryId",
+  })
 
   res.status(200).json({
     message: "Cart updated successfully",
@@ -142,7 +146,10 @@ export const removeCartItem = async (req, res, next) => {
 
   // Save the updated cart
   await cart.save();
-
+  await cart.populate({
+    path: "cart.menuItem",
+    select: "name price description image averageRating ingredients available categoryId",
+  })
   res
     .status(200)
     .json({ success: true, message: "Item removed from cart", cart });
