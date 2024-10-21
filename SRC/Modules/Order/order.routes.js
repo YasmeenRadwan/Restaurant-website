@@ -8,5 +8,6 @@ import * as orderController from "./order.controller.js";
 router.post('/',auth(), errorHandle(orderController.createOrder));
  router.get('/',auth(), errorHandle(orderController.getAllOrders));
  router.get('/:orderId',auth(), errorHandle(orderController.getOrder));
+ router.patch('/:orderId',auth(), errorHandle(orderController.cancelOrder));
 
 export default router;

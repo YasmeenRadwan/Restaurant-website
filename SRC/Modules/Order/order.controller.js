@@ -78,7 +78,8 @@ export const createOrder=async(req,res,next)=>{
         orderStatus,
         preparingTime,
         estimatedDeliveryTime,
-        deliveryOption 
+        deliveryOption,
+        specialInstructions
     });
 
     await order.save();
@@ -118,4 +119,26 @@ export const getOrder = async (req, res, next) => {
     }
 
     res.json({ message: "Order fetched successfully", order });
+};
+
+////////////////////////////////cancel order ///////////////////////////////////
+
+export const cancelOrder = async (req, res, next) => {
+    const userId = req.authUser._id;
+    const {orderId} = req.params;
+
+    const order = await Order.findOne({ userId, _id: orderId ,  orderStatus: { $in: ['pending', 'confirmed', 'placed', 'preparing'] }});
+
+    if (!order) {
+        return next(new errorHandlerClass("No order found", 404, "No order found"));
+    }
+
+    if (order.orderStatus === 'preparing') {
+        return next(new errorHandlerClass("Order cannot be cancelled. It has already been placed", 400, "Order cannot be cancelled"));
+    }
+    
+    order.orderStatus = 'cancelled';
+    await order.save();
+
+    res.json({ message: "Order cancelled successfully", order });
 };
