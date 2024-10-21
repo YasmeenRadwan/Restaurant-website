@@ -95,10 +95,9 @@ export const createOrder=async(req,res,next)=>{
 
 export const getAllOrders = async (req, res, next) => {
     const userId = req.authUser._id;
-    const orders = await Order.find({ userId }).populate({
-        path: 'menuItems.menuItem',
-        select: 'name price description image'  
-    });
+    const orders = await Order.find({ userId })
+      .populate('menuItems.menuItem','name price description image')
+      .populate('addressId', 'city country addressLabel');;
     if (orders.length === 0) {
         return next(new errorHandlerClass("No orders found", 404, "No orders found"));
     }
@@ -111,10 +110,10 @@ export const getAllOrders = async (req, res, next) => {
 export const getOrder = async (req, res, next) => {
     const userId = req.authUser._id;
     const {orderId} = req.params;
-    const order = await Order.findOne({ userId,_id:orderId }).populate({
-        path: 'menuItems.menuItem',
-        select: 'name price description image'  
-    });
+    const order = await Order.findOne({ userId,_id:orderId })
+      .populate('menuItems.menuItem','name price description image')
+      .populate('userId', 'firstName lastName')
+      .populate('addressId', 'city country addressLabel');;
     if (!order) {
         return next(new errorHandlerClass("No order found", 404, "No order found"));
     }
