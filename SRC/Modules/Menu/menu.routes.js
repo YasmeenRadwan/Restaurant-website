@@ -14,14 +14,19 @@ const router= Router();
 
 import * as menuController from './menu.controller.js';
 
+router.post('/favourite',auth(),errorHandle(menuController.addToFavourite));
+router.get('/favourite',auth(),errorHandle(menuController.getUserFavourites));
+router.get('/:_id', errorHandle(menuController.getMenuById));
+router.get('/category/:categoryId',errorHandle(menuController.getMenuForCategory));
+router.get('/',errorHandle(menuController.getAllMenu));
+
+
+
 //admin apis
 router.post('/',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),validationMiddleware(menuSchema),errorHandle(menuController.createMenu));
 router.patch('/:_id',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),validationMiddleware(menuSchema),errorHandle(menuController.updateMenuItem));
 router.delete('/:_id',auth(),authorization(systemRoles.ADMIN), multerHost({allowedExtensions : extensions.images }).single('image'),errorHandle(menuController.deleteMenuItem));
 
-router.get('/:_id', errorHandle(menuController.getMenuById));
-router.get('/category/:categoryId',errorHandle(menuController.getMenuForCategory));
-router.get('/',errorHandle(menuController.getAllMenu));
 
 
 

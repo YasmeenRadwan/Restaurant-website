@@ -180,7 +180,6 @@ export const updateOrderStatus = async (req, res, next) => {
         return next(new errorHandlerClass("Invalid order status", 400, "Invalid order status"));
     }
 
-
     const order = await Order.findOneAndUpdate(
         { _id: orderId },
         { orderStatus:status },

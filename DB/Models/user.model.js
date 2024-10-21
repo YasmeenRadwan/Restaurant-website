@@ -65,6 +65,10 @@ const userSchema=new Schema(
           type: mongoose.Schema.Types.ObjectId,
             ref: "Cart",
         },
+        favourite: [{
+          type: mongoose.Schema.Types.ObjectId,
+            ref: "Menu",
+        }],
         otp: { type: String },
         otpExpires: { type: Date }
     },

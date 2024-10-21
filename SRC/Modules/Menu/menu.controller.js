@@ -1,4 +1,5 @@
 import Menu from "../../../DB/Models/menu.model.js";
+import User from "../../../DB/Models/user.model.js";
 import Category from "../../../DB/Models/category.model.js";
 import {cloudinaryConfig} from "../../utils/cloudinary.utils.js";
 import {nanoid} from "nanoid";
@@ -158,3 +159,47 @@ export const deleteMenuItem = async(req,res,next) => {
 
     res.json({message: "menu item deleted successfully"});
 }
+
+//////////////////////////////// add to favourite //////////////////////////////////////////
+
+export const addToFavourite = async (req, res, next) => {
+    const {itemId} = req.body;
+    const userId = req.authUser._id;
+
+    const menu = await Menu.findById(itemId);
+
+    if (!menu) {
+        return next(new errorHandlerClass("Menu Item not found", 404, "Menu Item not found"));
+    }
+
+    const user = await User.findById(userId);
+    const alreadyFavourite = user.favourite.find((id) => id.toString() === itemId);
+
+    if (alreadyFavourite) {
+        // Remove from favourite
+        await User.findByIdAndUpdate(userId, { $pull: { favourite: itemId } }, { new: true });
+        res.json({ message: "Menu item removed from favourites" });
+    } else {
+        // Add to favourite
+        await User.findByIdAndUpdate(userId, { $push: { favourite: itemId } }, { new: true });
+        res.json({ message: "Menu item added to favourites" });
+    }
+}; 
+
+////////////////////////////// get user favourite Menu Items  //////////////////////////////////////////
+
+export const getUserFavourites = async (req, res, next) => {
+    const userId = req.authUser._id;
+
+    const user = await User.findById(userId).populate('favourite').select('favourite');
+
+    if (!user) {
+        return next(new errorHandlerClass("User not found", 404, "User not found"));
+    }
+    
+    if (user.favourite.length===0){
+        return res.json({ message: "No favourite menu items found" });
+    }
+
+    res.json({ message: "Favourite menu items fetched successfully", user });
+};
