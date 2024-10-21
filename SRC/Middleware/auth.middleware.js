@@ -17,7 +17,11 @@ export const auth = () => {
                 return next(new errorHandlerClass('Invalid Token',401,'Invalid Token'));
             }
 
-            const originalToken=token.split(" ")[1];
+        const originalToken=token.split(" ")[1];
+
+        if(!originalToken){
+            return next(new errorHandlerClass('Invalid Token',401,'Invalid Token'))
+        }
             const decodedData =verifyJWT(originalToken);
             console.log(decodedData);
             if(!decodedData?._id){
