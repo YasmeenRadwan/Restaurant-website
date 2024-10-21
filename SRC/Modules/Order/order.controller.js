@@ -3,6 +3,7 @@ import { errorHandlerClass } from "../../utils/error-class.utils.js";
 import Address from "../../../DB/Models/address.model.js";
 import Order from "../../../DB/Models/order.model.js";
 import User from "../../../DB/Models/user.model.js";
+import { ServerHeartbeatSucceededEvent } from "mongodb";
 
 
 export const createOrder=async(req,res,next)=>{
@@ -141,4 +142,55 @@ export const cancelOrder = async (req, res, next) => {
     await order.save();
 
     res.json({ message: "Order cancelled successfully", order });
+};
+
+////////////////////////////////update orders by status or userId ///////////////////////////////////
+export const getUsersOrders = async (req, res, next) => {
+    const { userId, status } = req.query; // Take filters from query parameters
+
+    const filter = {};
+    if (userId) {
+        filter.userId = userId;
+    }
+    if (status) {
+        filter.orderStatus = status;
+    }
+
+    const orders = await Order.find(filter)
+        .populate('menuItems.menuItem', 'name price description image')
+        .populate('userId', 'firstName lastName')
+        .populate('addressId', 'city country addressLabel');
+
+    if (!orders || orders.length === 0) {
+        return next(new errorHandlerClass("No orders found", 404, "No orders found"));
+    }
+
+    res.json({ message: "Orders fetched successfully", orders });
+ 
+};
+
+////////////////////////////////update order status ///////////////////////////////////
+export const updateOrderStatus = async (req, res, next) => {
+    const { orderId } = req.params; 
+    const { status } = req.body; 
+
+    const validOrderStatus = ['pending', 'confirmed', 'placed', 'preparing', 'cancelled', 'on the way','delivered'];
+
+    if (!validOrderStatus.includes(status)) {
+        return next(new errorHandlerClass("Invalid order status", 400, "Invalid order status"));
+    }
+
+
+    const order = await Order.findOneAndUpdate(
+        { _id: orderId },
+        { orderStatus:status },
+        { new: true } 
+    );
+
+    if (!order) {
+        return next(new errorHandlerClass("Order not found", 404, "Order not found"));
+    }
+
+    res.json({ message: "Order status updated successfully", order });
+
 };
