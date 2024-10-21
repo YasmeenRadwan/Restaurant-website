@@ -22,11 +22,12 @@ export const auth = () => {
         if(!originalToken){
             return next(new errorHandlerClass('Invalid Token',401,'Invalid Token'))
         }
-            const decodedData =verifyJWT(originalToken);
-            console.log(decodedData);
-            if(!decodedData?._id){
-                return next(new errorHandlerClass('Invalid Token Payload',400,'Invalid Token Payload'));
-            }
+
+        const decodedData =verifyJWT(originalToken);
+        console.log(decodedData);
+        if(!decodedData?._id){
+            return next(new errorHandlerClass('Invalid Token Payload',400,'Invalid Token Payload'));
+        }
 
             const user=await User.findById(decodedData._id).populate("sessionId").select("-password")
             if(!user){
