@@ -7,7 +7,7 @@ const reviewSchema = new Schema({
         ref: 'User',
         required: true
     },
-    ItemId:{
+    itemId:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Menu',
         required: true
@@ -16,6 +16,10 @@ const reviewSchema = new Schema({
         type: Number,
         min: 1,
         max: 5
+    },
+    reviewTitle:{
+        type: String,
+        required: true,
     },
     reviewText:{
         type: String,

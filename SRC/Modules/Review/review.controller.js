@@ -1,10 +1,11 @@
 import { errorHandlerClass } from "../../utils/error-class.utils.js";
 import Review from "../../../DB/Models/review.model.js";
 import Menu from "../../../DB/Models/menu.model.js";
+import Order from "../../../DB/Models/order.model.js"
 
 export const addReview = async (req, res, next) => {
     const userId = req.authUser._id;
-    const { itemId,rating, text } = req.body;
+    const { itemId,rating, title,text } = req.body;
 
     //check if item exist
     const item = await Menu.findById(itemId);
@@ -24,7 +25,9 @@ export const addReview = async (req, res, next) => {
         return next(new errorHandlerClass("You have not bought this item", 400, "You have not bought this item"));
     }
 
-    const review = { userId, itemId, reviewRating:rating, reviewText:text };
+    const review = { userId, itemId, reviewRating:rating, reviewTitle:title ,reviewText:text };
+    console.log(review);
+    
     const newReview = await Review.create(review);
 
     res.json({ message: "Review added successfully", newReview });
