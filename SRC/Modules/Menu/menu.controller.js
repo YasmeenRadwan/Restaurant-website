@@ -1,5 +1,6 @@
 import Menu from "../../../DB/Models/menu.model.js";
 import User from "../../../DB/Models/user.model.js";
+import Review from "../../../DB/Models/review.model.js";
 import Category from "../../../DB/Models/category.model.js";
 import {cloudinaryConfig} from "../../utils/cloudinary.utils.js";
 import {nanoid} from "nanoid";
@@ -66,8 +67,11 @@ export const getMenuById  = async (req, res,next) => {
     if (!menuItem){
           return next (new errorHandlerClass("Menu Item not found", 404, "Menu Item not found"));
        }
+    
+    const reviews = await Review.find({ itemId: _id })
+        .populate('userId','firstName lastName -_id' ).select('-_id');
 
-       res.json({ message: "Menu item data fetched successfully", menuItem });
+       res.json({ message: "Menu item data fetched successfully", menuItem,reviews });
 
 }
 

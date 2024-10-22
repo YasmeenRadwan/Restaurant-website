@@ -30,7 +30,15 @@ export const addReview = async (req, res, next) => {
     
     const newReview = await Review.create(review);
 
-    res.json({ message: "Review added successfully", newReview });
-    
+    const reviews = await Review.find({ itemId }); // Find all reviews for this item
+    const totalRating = reviews.reduce((sum, review) => sum + review.reviewRating, 0);
+    const averageRating = reviews.length > 0 ? totalRating / reviews.length : 0;
 
+    // Update the menu item with the new average rating
+    item.averageRating = averageRating.toFixed(2);
+    await item.save(); // Save the updated menu item
+
+
+    res.json({ message: "Review added successfully", newReview });
 }
+

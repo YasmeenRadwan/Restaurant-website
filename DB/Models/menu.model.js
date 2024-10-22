@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const {Schema , model} =mongoose;
-
+/*
 const ratingSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -13,7 +13,7 @@ const ratingSchema = new mongoose.Schema({
     min: 0,
     max: 5,
   },
-}, { _id: false }); 
+}, { _id: false }); */
 
 const menuSchema=new Schema(
     {
@@ -59,8 +59,6 @@ const menuSchema=new Schema(
             default: 0,
             min: 0,
           },
-          ratings: [ratingSchema],
-        
           averageRating: {
             type: Number,
             default: 0,
