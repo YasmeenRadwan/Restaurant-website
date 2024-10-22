@@ -8,6 +8,7 @@ import menuRouter from './SRC/Modules/Menu/menu.routes.js';
 import cartRouter from "./SRC/Modules/Cart/cart.routes.js";
 import addressRouter from './SRC/Modules/Address/address.routes.js';
 import orderRouter from './SRC/Modules/Order/order.routes.js';
+import reviewRouter from './SRC/Modules/review/review.routes.js';
 
 import { config } from 'dotenv';
 import path from "path";
@@ -42,6 +43,7 @@ app.use('/menu',menuRouter);
 app.use('/cart',cartRouter);
 app.use('/address',addressRouter);
 app.use('/order',orderRouter);
+app.use('/review', reviewRouter);
 
 app.use(globalResponse);
 

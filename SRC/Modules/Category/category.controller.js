@@ -24,6 +24,11 @@ export const createCategory=async(req,res,next)=>{
     const customId=nanoid(4);
     const {secure_url,public_id} = await cloudinaryConfig().uploader.upload(req.file.path,{
         folder : `${process.env.UPLOADS_FOLDER}/Categories/${customId}`,
+        /*transformation: [
+        { quality: 'auto', fetch_format: 'auto', crop: 'limit', width: 800 },
+      ],
+    });
+    */
     });
 
     const categoryInstance= new Category({name,  image: {secure_url,public_id} ,customId, createdBy});
