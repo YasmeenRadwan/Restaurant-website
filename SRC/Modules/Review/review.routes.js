@@ -8,6 +8,4 @@ import * as reviewController from "./review.controller.js";
 
 router.post('/',auth(), errorHandle(reviewController.addReview));
 
-router.get('/:itemId', auth(), errorHandle(reviewController.getReviewByItemId));
-
 export default router;

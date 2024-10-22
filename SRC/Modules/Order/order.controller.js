@@ -55,15 +55,6 @@ export const createOrder=async(req,res,next)=>{
      
     }
 
-    let orderStatus;
-
-    // Set order status based on payment method
-    if (paymentMethod === "cash") {
-        orderStatus = 'placed';
-    } else {
-        orderStatus = 'pending';
-    }
-
     const order = new Order({
         userId,
         menuItems: cart.cart,
@@ -74,7 +65,7 @@ export const createOrder=async(req,res,next)=>{
         deliveryFee,
         subTotal,
         total,
-        orderStatus,
+        orderStatus :paymentMethod === "cash"? 'placed' :'pending',
         preparingTime,
         estimatedDeliveryTime,
         deliveryOption,
