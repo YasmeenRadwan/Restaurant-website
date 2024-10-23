@@ -1,5 +1,6 @@
 
 import mongoose from 'mongoose';
+import Cart from "./cart.model.js"
 
 const orderSchema = new mongoose.Schema({
   userId: {
@@ -86,9 +87,10 @@ const orderSchema = new mongoose.Schema({
 // Pre-save middleware to clear cart when order status is confirmed
 orderSchema.pre('save', async function (next) {
   if (this.isModified('orderStatus') && this.orderStatus === 'confirmed') {
+    console.log("clear cart ",this.orderStatus );
     try {
-      // Clear the user cart
-      await Cart.findOneAndUpdate({ user: this.userId }, { $set: { cart: [] } });
+      // Clear the user cart 
+      await Cart.findOneAndUpdate({ user: this.userId }, { $set: { cart: [] , totalCartPrice : 0 } }); // where the cart came from 😢
     } catch (error) {
       return next(error);
     }

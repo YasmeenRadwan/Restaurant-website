@@ -39,11 +39,15 @@ const cartSchema = new mongoose.Schema({
 });
 
 cartSchema.pre("save", function (next) {
-  let total = 0;
-  this.cart.forEach(item => {
-    total += item.totalPrice;
-  });
-  this.totalCartPrice = total;
+  if(this.cart.length === 0){
+    this.totalCartPrice = 0
+  }else{
+    let total = 0;
+    this.cart.forEach(item => {
+      total += item.totalPrice;
+    });
+    this.totalCartPrice = total;
+  }
   next();
 });
 
