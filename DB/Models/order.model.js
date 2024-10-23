@@ -25,7 +25,6 @@ const orderSchema = new mongoose.Schema({
       },
     },
   ],
-  address: Object,
   addressId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Address',
@@ -58,7 +57,7 @@ const orderSchema = new mongoose.Schema({
   },
   orderStatus: {
     type: String,
-    enum: ['pending', 'confirmed', 'placed', 'preparing', 'cancelled', 'on the way','delivered'],
+    enum: ['pending', 'confirmed', 'preparing', 'cancelled', 'on the way','delivered'],
     default: 'pending',
   },
   paymentMethod: {
@@ -83,12 +82,19 @@ const orderSchema = new mongoose.Schema({
 {
   timestamps: true,
 });
-/*
-orderSchema.pre('save', function (next) {
-  this.updatedAt = Date.now();
-  next();
-});*/
 
+// Pre-save middleware to clear cart when order status is confirmed
+orderSchema.pre('save', async function (next) {
+  if (this.isModified('orderStatus') && this.orderStatus === 'confirmed') {
+    try {
+      // Clear the user cart
+      await Cart.findOneAndUpdate({ user: this.userId }, { $set: { cart: [] } });
+    } catch (error) {
+      return next(error);
+    }
+  }
+  next();
+});
 const Order = mongoose.model('Order', orderSchema);
 
 export default Order;

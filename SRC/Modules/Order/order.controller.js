@@ -6,7 +6,7 @@ import User from "../../../DB/Models/user.model.js";
 
 export const createOrder=async(req,res,next)=>{
     const userId=req.authUser._id;
-    const { address , addressId, contactNumber, paymentMethod,deliveryOption,specialInstructions,preparingTime=30} = req.body;
+    const { addressId, contactNumber, paymentMethod,deliveryOption,specialInstructions,preparingTime=30} = req.body;
 
     const cart = await Cart.findOne({user:userId});
 
@@ -26,7 +26,7 @@ export const createOrder=async(req,res,next)=>{
     const subTotal = cart.totalCartPrice;
     const total = subTotal + deliveryFee;
 
-    if (!address && !addressId && deliveryOption !== 'pickup') {
+    if (!addressId && deliveryOption !== 'pickup') {
         return next(new errorHandlerClass('Address is required for delivery', 400, 'Address is required'));
     }
 
@@ -36,7 +36,7 @@ export const createOrder=async(req,res,next)=>{
             return next(new errorHandlerClass('Invalid Address', 404, 'Invalid Address'));
         }
     }
-
+/*
     if(deliveryOption === 'delivery' && address ){
         //save address 
         const newAddress = new Address({
@@ -52,20 +52,19 @@ export const createOrder=async(req,res,next)=>{
             { _id: userId },
             { $push: { addresses: newAddress._id } } // Add the address ID to the user's addresses array
         );
-     
     }
+ */
 
     const order = new Order({
         userId,
         menuItems: cart.cart,
-        address :deliveryOption === 'delivery'? address : undefined,
         addressId,
         contactNumber,
         paymentMethod,
         deliveryFee,
         subTotal,
         total,
-        orderStatus :paymentMethod === "cash"? 'placed' :'pending',
+        orderStatus :paymentMethod === "cash"? 'confirmed' :'pending',
         preparingTime,
         estimatedDeliveryTime,
         deliveryOption,
@@ -74,14 +73,10 @@ export const createOrder=async(req,res,next)=>{
 
     await order.save();
 
-    cart.cart=[];
-    await cart.save();
-
     res.json({ message: "Order created", order });
 };
 
 ////////////////////////////////get orders ///////////////////////////////////
-
 export const getAllOrders = async (req, res, next) => {
     const userId = req.authUser._id;
     const orders = await Order.find({ userId })
@@ -116,7 +111,7 @@ export const cancelOrder = async (req, res, next) => {
     const userId = req.authUser._id;
     const {orderId} = req.params;
 
-    const order = await Order.findOne({ userId, _id: orderId ,  orderStatus: { $in: ['pending', 'confirmed', 'placed', 'preparing'] }});
+    const order = await Order.findOne({ userId, _id: orderId ,  orderStatus: { $in: ['pending', 'confirmed', 'preparing'] }});
 
     if (!order) {
         return next(new errorHandlerClass("No order found", 404, "No order found"));
@@ -162,7 +157,7 @@ export const updateOrderStatus = async (req, res, next) => {
     const { orderId } = req.params; 
     const { status } = req.body; 
 
-    const validOrderStatus = ['pending', 'confirmed', 'placed', 'preparing', 'cancelled', 'on the way','delivered'];
+    const validOrderStatus = ['pending', 'confirmed', 'preparing', 'cancelled', 'on the way','delivered'];
 
     if (!validOrderStatus.includes(status)) {
         return next(new errorHandlerClass("Invalid order status", 400, "Invalid order status"));
