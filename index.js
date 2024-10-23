@@ -14,8 +14,10 @@ import morgan from 'morgan';
 import { config } from 'dotenv';
 import path from "path";
 
+import { createServer } from 'http';
+import { initSocket , push} from './SRC/utils/socket.js'
+
 import cors from 'cors'; 
- 
 const app = express();
 
 if (process.env.NODE_ENV === 'prod') {
@@ -26,18 +28,13 @@ if (process.env.NODE_ENV === 'prod') {
     config();
 }
 
-
 let port = process.env.PORT;
 app.use(cors());
 app.use(express.json())
 app.use(morgan("dev"))
 
-// not needed as we use cors
-// app.use((req, res, next) => {
-//     res.header('Access-Control-Allow-Origin', '*');
-//     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-//     next();
-//   }); 
+const httpServer = createServer(app);
+initSocket(httpServer);
 
 app.use('/user',userRouter);
 app.use('/category',categoryRouter);
@@ -56,5 +53,6 @@ console.log("port" , process.env.CONNECTION_DB_URI);
 
 app.get('/', (req, res) => res.send('Hello World!'))
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+// app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+httpServer.listen(port, () => console.log(`Server listening on port ${port}!`));
 
