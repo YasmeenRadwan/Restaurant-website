@@ -66,6 +66,9 @@ const orderSchema = new mongoose.Schema({
     enum: ['cash', 'card'],
     required: true,
   },
+  transactionId : {
+    type: String,
+  },
   deliveryOption:{
     type: String,
     enum: ['delivery', 'pickup'],

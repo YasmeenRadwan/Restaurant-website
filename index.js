@@ -9,7 +9,8 @@ import cartRouter from "./SRC/Modules/Cart/cart.routes.js";
 import addressRouter from './SRC/Modules/Address/address.routes.js';
 import orderRouter from './SRC/Modules/Order/order.routes.js';
 import reviewRouter from './SRC/Modules/Review/review.routes.js';
-
+import paymentRouter from "./SRC/Modules/Payment/payment.routes.js"
+import morgan from 'morgan';
 import { config } from 'dotenv';
 import path from "path";
 
@@ -29,6 +30,7 @@ if (process.env.NODE_ENV === 'prod') {
 let port = process.env.PORT;
 app.use(cors());
 app.use(express.json())
+app.use(morgan("dev"))
 
 // not needed as we use cors
 // app.use((req, res, next) => {
@@ -44,6 +46,7 @@ app.use('/cart',cartRouter);
 app.use('/address',addressRouter);
 app.use('/order',orderRouter);
 app.use('/review', reviewRouter);
+app.use('/pay', paymentRouter)
 
 app.use(globalResponse);
 
