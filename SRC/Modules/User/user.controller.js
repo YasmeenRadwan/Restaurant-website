@@ -11,7 +11,7 @@ import Address from "../../../DB/Models/address.model.js";
 //////////////////////////// signUp  /////////////////////////////////
 export const signUp=async(req,res,next)=>{
  
-    const{firstName,lastName,email,password,mobileNumber,country, city ,buildingNumber,floorNumber,addressLabel,role}=req.body;
+    const{firstName,lastName,email,password,mobileNumber,role}=req.body;
     // Insure the Email exists
     const isEmailExist=await User.findOne({email})
     
@@ -38,7 +38,7 @@ export const signUp=async(req,res,next)=>{
     const token = generateJWT(userInstance._id, sessionId);
     const newUser = await userInstance.save();
    // const userToSend = userToUser(newUser);
-
+/*
     // save address as default
     const addressInstance=new Address({userId:userInstance._id,
         country, city ,buildingNumber,floorNumber,addressLabel,isDefault: true});
@@ -47,9 +47,9 @@ export const signUp=async(req,res,next)=>{
     await User.updateOne(
         { _id: userInstance._id },
         { $push: { addresses: addressInstance._id } } // Add the address ID to the user's addresses array
-    );
+    );*/
 
-    const updatedUser = await User.findById(newUser._id).populate('addresses');
+    const updatedUser = await User.findById(newUser._id);
 
     // Format the user data to send in the response
     const userToSend = userToUser(updatedUser);
