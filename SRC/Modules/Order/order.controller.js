@@ -81,7 +81,9 @@ export const getAllOrders = async (req, res, next) => {
     const userId = req.authUser._id;
     const orders = await Order.find({ userId })
       .populate('menuItems.menuItem','name price description image')
-      .populate('addressId', 'city country addressLabel');;
+      .populate('addressId', 'city country addressLabel')
+      .sort({ createdAt: -1 }); // Sort desc 
+
     if (orders.length === 0) {
         return next(new errorHandlerClass("No orders found", 404, "No orders found"));
     }
