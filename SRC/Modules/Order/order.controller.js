@@ -145,7 +145,8 @@ export const getUsersOrders = async (req, res, next) => {
     const orders = await Order.find(filter)
         .populate('menuItems.menuItem', 'name price description image')
         .populate('userId', 'firstName lastName')
-        .populate('addressId', 'city country addressLabel');
+        .populate('addressId', 'city country addressLabel')
+        .sort({ createdAt: -1 }); // Sort desc 
 
     if (!orders || orders.length === 0) {
         return next(new errorHandlerClass("No orders found", 404, "No orders found"));
