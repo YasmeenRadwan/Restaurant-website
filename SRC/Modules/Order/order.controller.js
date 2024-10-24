@@ -59,7 +59,7 @@ export const createOrder=async(req,res,next)=>{
     const order = new Order({
         userId,
         menuItems: cart.cart,
-        addressId,
+        addressId : deliveryOption ==='delivery' ? addressId: undefined,
         contactNumber,
         paymentMethod,
         deliveryFee,
