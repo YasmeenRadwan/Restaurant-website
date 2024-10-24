@@ -3,6 +3,7 @@ import { errorHandlerClass } from "../../utils/error-class.utils.js";
 import Address from "../../../DB/Models/address.model.js";
 import Order from "../../../DB/Models/order.model.js";
 import User from "../../../DB/Models/user.model.js";
+import { push , updateOrder} from "../../utils/socket.js";
 
 export const createOrder=async(req,res,next)=>{
     const userId=req.authUser._id;
@@ -175,6 +176,8 @@ export const updateOrderStatus = async (req, res, next) => {
         return next(new errorHandlerClass("Order not found", 404, "Order not found"));
     }
 
+    push(order.userId.toString(), {message : `order status updated: ${order.orderStatus}`, status : order.orderStatus})
+    updateOrder(order.userId.toString(), {orderId , status })
     res.json({ message: "Order status updated successfully", order });
 
 };
